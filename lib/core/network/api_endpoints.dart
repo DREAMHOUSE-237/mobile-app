@@ -19,6 +19,7 @@ class ApiEndpoints {
   static const String biens            = '/PUBLICATION-SERVICE/api/biens';
   static const String mesPublications  = '/PUBLICATION-SERVICE/api/biens/mes-publications';
   static String bienById(String id)    => '/PUBLICATION-SERVICE/api/biens/$id';
+  static String retryPayment(String id) => '/PUBLICATION-SERVICE/api/biens/$id/retry-payment';
   static String bienSearchVille(String ville) =>
       '/PUBLICATION-SERVICE/api/biens/search/ville?ville=$ville';
   static String bienSearchCategorie(String cat) =>

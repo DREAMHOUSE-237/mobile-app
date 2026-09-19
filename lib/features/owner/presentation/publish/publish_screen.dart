@@ -39,6 +39,7 @@ class _PublishScreenState extends ConsumerState<PublishScreen> {
   PaymentStatus _paymentStatus = PaymentStatus.idle;
   String _apiError = '';
   int _redirectCount = 4;
+  String? _createdBienId;
 
   Timer? _countdownTimer;
   Timer? _pollingTimer;
@@ -184,6 +185,18 @@ class _PublishScreenState extends ConsumerState<PublishScreen> {
     });
 
     try {
+      // Une annonce a déjà été créée lors d'une tentative précédente : on
+      // relance juste la demande de paiement (pas de ré-upload des photos,
+      // pas de nouvelle annonce en double).
+      if (_createdBienId != null) {
+        await ref
+            .read(publicationNotifierProvider.notifier)
+            .retryPayment(_createdBienId!, num);
+        setState(() => _paymentStatus = PaymentStatus.pendingUssd);
+        _startPolling(_createdBienId!);
+        return;
+      }
+
       // Sauvegarde le numéro dans le state
       ref.read(publicationNotifierProvider.notifier).updateStep2(
         numeroPaiement: num,
@@ -197,6 +210,7 @@ class _PublishScreenState extends ConsumerState<PublishScreen> {
           .submitAndGetId();
 
       if (bienId != null && bienId.isNotEmpty) {
+        _createdBienId = bienId;
         setState(() => _paymentStatus = PaymentStatus.pendingUssd);
         _startPolling(bienId);
       } else {

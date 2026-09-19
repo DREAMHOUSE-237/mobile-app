@@ -119,6 +119,16 @@ class PublicationNotifier extends StateNotifier<PublicationFormState> {
     return bienId;
   }
 
+  // ── RETRY PAIEMENT (annonce déjà créée) ───────────────────────────────────
+  // Contrairement à submitAndGetId(), ne renvoie ni photos ni documents :
+  // relance juste la demande de paiement pour un bien existant.
+  Future<void> retryPayment(String bienId, String numeroPaiement) async {
+    await _api.post(
+      ApiEndpoints.retryPayment(bienId),
+      data: {'numeroPaiement': numeroPaiement},
+    );
+  }
+
   void reset() => state = const PublicationFormState();
 }
 
